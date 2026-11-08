@@ -1,0 +1,22 @@
+# In deinem GitHub-Fork unter .github/workflows/build-parser.yml ablegen.
+# Baut das Kartenprogramm (inkl. C++-Teil) auf GitHubs Servern - du brauchst keine Build-Tools.
+name: build-parser
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.11.0
+      - run: npm install
+      - run: npm run build -w packages/clis/parser
+      - run: Remove-Item -Recurse -Force .git -ErrorAction SilentlyContinue
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maps-built
+          path: .
